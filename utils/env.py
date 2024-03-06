@@ -43,11 +43,12 @@ class SimplifiedStockTradingEnv(gym.Env):
         if len(normalized_close_price) < self.T:
             num_padding = 20 - len(normalized_close_price)
             padding_value = 0
-            normalized_close_price += [padding_value] * num_padding
+            pad = [padding_value] * num_padding
+            normalized_close_price = np.concatenate((pad, normalized_close_price))
 
         account_balance = self.balance
         shares_held = self.shares_held 
-        obs = np.array(normalized_close_price+[account_balance, shares_held])
+        obs = np.concatenate((normalized_close_price, [account_balance, shares_held]))
         return obs
     
 

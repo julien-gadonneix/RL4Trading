@@ -28,7 +28,7 @@ class EpsilonGreedy:
             action = np.random.uniform(-1, 1)
         else:
             state_tensor = torch.tensor(state, dtype=torch.float32, device=self.model.device)
-            action = self.model(state_tensor)[0]
+            action = self.model(state_tensor).detach().cpu().numpy().item()
 
         return action
 

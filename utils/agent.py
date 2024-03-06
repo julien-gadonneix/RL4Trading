@@ -19,7 +19,7 @@ class Agent:
         self.epsilon_greedy = epsilon_greedy
         
 
-    def train(self, state, action, reward, next_state, done, num_episodes, gamma, batch_size):
+    def train(self, num_episodes, gamma, batch_size):
         '''Trains the agent.'''
         iteration = 0
         episode_reward_list = []
@@ -27,11 +27,11 @@ class Agent:
         for episode_index in tqdm(range(1, num_episodes)):
             state = self.env.reset()
             episode_reward = 0
-            state = torch.tensor(state, dtype=torch.float).unsqueeze(0).to(self.model.device)
+            state_tensor = torch.tensor(state, dtype=torch.float).unsqueeze(0).to(self.model.device)
 
 
             for t in itertools.count():
-                action = self.epsilon_greedy(state)
+                action = self.epsilon_greedy(state_tensor)
                 next_state, reward, done = self.env.step(action)
                 self.replay_buffer.add(state, action, reward, next_state, done)
                 episode_reward += reward
