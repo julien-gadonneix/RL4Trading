@@ -19,8 +19,7 @@ class ReplayBuffer:
     def sample(self, batch_size: int) -> Tuple[np.ndarray, float, float, np.ndarray, bool]:
         '''Sample a batch from the buffer.'''
         states, actions, rewards, next_states, dones = zip(*random.sample(self.buffer, batch_size))
-        return np.array(states), actions, rewards, np.array(next_states), dones
-
+        return states, actions, rewards, next_states, dones
 
     def __len__(self):
         '''Return the length of the buffer.'''

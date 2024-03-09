@@ -7,7 +7,7 @@ class SimplifiedStockTradingEnv(gym.Env):
     '''A simplified stock trading environment for reinforcement learning.'''
 
 
-    def __init__(self, df, start_balance=1000, T=20, d=1):
+    def __init__(self, df, start_balance=1000., T=20, d=1):
         super(SimplifiedStockTradingEnv, self).__init__()
 
         self.df = df
@@ -17,6 +17,8 @@ class SimplifiedStockTradingEnv(gym.Env):
         # Number of different stocks to look at
         self.d = d
         self.max_share_price = df['Close'].max()
+
+        self.df['Close normalized']=self.df["Close"]/self.max_share_price
         
         # Actions: real number between -1 and 1
         # 0: Hold
@@ -34,27 +36,20 @@ class SimplifiedStockTradingEnv(gym.Env):
 
         self.current_step = 0
         self.balance = start_balance
-        self.shares_held = 0
+        self.shares_held = 0.
 
 
     def _next_observation(self):
         """Returns the next observation."""
-        normalized_close_price = self.df.iloc[max(0, self.current_step-self.T+1):self.current_step+1]['Close'].tolist() / self.max_share_price
-        if len(normalized_close_price) < self.T:
-            num_padding = 20 - len(normalized_close_price)
-            padding_value = 0
-            pad = [padding_value] * num_padding
-            normalized_close_price = np.concatenate((pad, normalized_close_price))
-
+        normalized_close_price = self.df.iloc[self.current_step-self.T:self.current_step+1]['Close normalized'].tolist() 
         account_balance = self.balance
         shares_held = self.shares_held 
-        obs = np.concatenate((normalized_close_price, [account_balance, shares_held]))
-        return obs
+        return normalized_close_price, account_balance, shares_held 
     
 
     def _take_action(self, action):
         """Updates the agent's balance and shares based on the action."""
-        current_price = self.df.iloc[self.current_step]['Close']
+        current_price = self.df.iloc[self.current_step]['Close normalized']
 
         if action > 0:  # Buy
             total_possible = self.balance / current_price
@@ -70,24 +65,31 @@ class SimplifiedStockTradingEnv(gym.Env):
 
     def step(self, action):
         """Executes a step in the environment."""
-        previous_wealth = self.balance + self.shares_held * self.df.iloc[self.current_step]['Close']
+        previous_wealth = self.balance + self.shares_held * self.df.iloc[self.current_step]['Close normalized']
         
-        if self.current_step > len(self.df) - 2: # end of data
+        if self.current_step > len(self.df) - 2 : # end of data
+            print("End of data")
             done = True
+            current_wealth = previous_wealth
+            reward = 0.
+            obs = self._next_observation()
         else : 
             self._take_action(action)
+            obs = self._next_observation()
             self.current_step += 1
-            done = False
+            current_wealth = self.balance + self.shares_held * self.df.iloc[self.current_step]['Close normalized']
+            reward = current_wealth - previous_wealth
+            if current_wealth<1e-12 : 
+                done = True
+            else :
+                done = False
 
-        obs = self._next_observation()
-        current_wealth = self.balance + self.shares_held * self.df.iloc[self.current_step]['Close']
-        reward = current_wealth - previous_wealth
         return obs, reward, done
 
 
     def reset(self):
         """Resets the environment to its initial state."""
         self.balance = self.start_balance
-        self.shares_held = 0
-        self.current_step = 0
+        self.shares_held = 0.
+        self.current_step = self.T
         return self._next_observation()
