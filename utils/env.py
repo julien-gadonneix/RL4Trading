@@ -68,7 +68,7 @@ class SimplifiedStockTradingEnv(gym.Env):
         previous_wealth = self.balance + self.shares_held * self.df.iloc[self.current_step]['Close normalized']
         
         if self.current_step > len(self.df) - 2 : # end of data
-            print("End of data")
+            # print("End of data")
             done = True
             current_wealth = previous_wealth
             reward = 0.

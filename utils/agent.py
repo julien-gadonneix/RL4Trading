@@ -26,7 +26,7 @@ class Agent:
         episode_reward = 0.
 
         for episode_index in tqdm(range(1, num_episodes+1)):
-            print(f"Episode {episode_index}")
+            # print(f"Episode {episode_index}")
             state = self.env.reset()
             episode_reward = 0.
             for iteration in itertools.count():
@@ -93,7 +93,7 @@ class Agent:
                         for target_param, source_param in zip(self.target_model.parameters(), self.model.parameters()):
                             target_param.copy_(source_param)
                 if done:
-                    print("It is done ")
+                    # print("It is done ")
                     break
 
                 state = next_state

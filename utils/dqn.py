@@ -9,9 +9,9 @@ class DQN(nn.Module):
         self.output_lstm_shape = 16
         self.hidden_layer_shape = 64
         self.output_shape = 1
-        self.numlayers = 1
+        self.numlayers = 2
         
-        self.lstm = nn.LSTM(input_size_price_list,  self.output_lstm_shape, self.numlayers, batch_first=True)
+        self.lstm = nn.LSTM(input_size_price_list,  self.output_lstm_shape, self.numlayers, bidirectional=True, batch_first=True)
         self.fc1 = nn.Linear(self.output_lstm_shape + input_size_balance_value + input_size_num_of_shares, self.hidden_layer_shape)
         self.fc2 = nn.Linear(self.hidden_layer_shape, self.output_shape)
 
