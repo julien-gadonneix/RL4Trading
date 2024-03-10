@@ -20,14 +20,17 @@ class EpsilonGreedy:
         self.model = model
 
 
-    def __call__(self, state: np.ndarray) -> np.int64:
+    def __call__(self, state: np.ndarray):
         '''Select an action for the given state using the epsilon-greedy policy.'''
         coin = np.random.uniform()
+        is_random_choice = True
 
         if coin < self.epsilon:
             action = np.random.randint(0, 3)
-            prop = np.random.uniform()
+            prop = 0.05
+            
         else:
+            is_random_choice = False
             normalized_close_price, account_balance, shares_held = state
             normalized_close_price = np.array(normalized_close_price)
             # from shape (21,) to (1,1,21)
@@ -43,8 +46,9 @@ class EpsilonGreedy:
             action = np.argmax(actions)
             sorted_arr = np.sort(actions)[::-1]
             prop = sorted_arr[0] - sorted_arr[1]
+         
 
-        return action, prop
+        return action, prop, is_random_choice
 
 
     def decay_epsilon(self):

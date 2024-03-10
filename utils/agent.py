@@ -19,6 +19,7 @@ class Agent:
         self.epsilon_greedy = epsilon_greedy
         self.action_list = list()
         self.wealth_list = list()
+        self.random_choice_list = list()
         
 
     def train(self, num_episodes, gamma, batch_size):
@@ -30,12 +31,14 @@ class Agent:
         for episode_index in tqdm(range(1, num_episodes+1)):
             self.action_list.append([])
             self.wealth_list.append([])
+            self.random_choice_list.append([])
             # print(f"Episode {episode_index}")
             state = self.env.reset()
             episode_reward = 0.
             for iteration in itertools.count():
 
-                action, prop = self.epsilon_greedy(state)
+                action, prop, is_random_choice = self.epsilon_greedy(state)
+                self.random_choice_list[-1].append(is_random_choice)
                 self.action_list[-1].append(action)
                 next_state, reward, done = self.env.step(action, prop)
                 self.replay_buffer.add(state, action, reward, next_state, done)
@@ -103,7 +106,8 @@ class Agent:
 
                 state = next_state
                 iteration += 1
-            print(f"Episode reward: {episode_reward}")
+            percentage_of_random_choices = np.mean(np.array(self.random_choice_list[-1]))
+            print(f"Episode {episode_index}, reward: {episode_reward}, percentage of random = {percentage_of_random_choices}")
             episode_reward_list.append(episode_reward)
             self.epsilon_greedy.decay_epsilon()
         return episode_reward_list
