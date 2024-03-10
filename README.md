@@ -1,31 +1,29 @@
 
 # RL4Trading
 
-In this project, we are trying to implement a Reinforcement Learning algorithm to financial data.
+In this project, we are implementing a Reinforcement Learning algorithm for financial data analysis.
 
-## Structure of the data
+## Data Structure
 
-We are fetching data from yahoo finance, through the API, and we are looking to close prices in our model.
+* We source our data from Yahoo Finance via their API, specifically focusing on the closing prices for our modeling purposes.
 
-## Structure of the model
+## Model Architecture
 
-### Environement
+### Environment
 
-Our environement is composed of :
-
-* A dataframe with stock price data,
-* A range of time which will be taken into account in the action process
-* A balance for the money that cna be invested
-* A number of shares held at every time steps
+* Our environment comprises:
+  - A dataframe containing stock price data,
+  - A specified time range for action consideration,
+  - A balance representing investable funds,
+  - A record of the number of shares held at each time step.
 
 ### Actions
 
-Our action space is composed of 3 different types :
+* Our action space encompasses three distinct types:
+  1. Buying a certain proportion of stocks based on the model's confidence in a buy strategy.
+  2. Selling a certain proportion of stocks based on the model's confidence in a sell strategy.
+  3. Taking no action.
 
-* Buy a certain proportion of stocks according to the confidence of the model to choose a buying strategy
-* Sell a certain propoértion of stocks according to the confidence of the model to choose a selling strategy
-* Do nothing
+### Deep Q-Network (DQN)
 
-### Deep Q-Network
-
-Our DQN is based on a mixture of layers especially LSTM because we are dealing with sequence of trading data, and other informations such as the number of stocks held, the account balance, aso.
+* Our DQN architecture is a blend of various layers, notably incorporating LSTM due to the sequential nature of trading data. Additionally, it considers other relevant factors such as the number of stocks held and the current account balance.
