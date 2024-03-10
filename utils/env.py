@@ -90,6 +90,6 @@ class SimplifiedStockTradingEnv(gym.Env):
     def reset(self):
         """Resets the environment to its initial state."""
         self.balance = self.start_balance
-        self.shares_held = 0.
+        self.shares_held = 5.
         self.current_step = self.T
         return self._next_observation()
