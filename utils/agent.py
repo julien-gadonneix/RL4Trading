@@ -31,8 +31,8 @@ class Agent:
             episode_reward = 0.
             for iteration in itertools.count():
 
-                action = self.epsilon_greedy(state)
-                next_state, reward, done = self.env.step(action)
+                action, prop = self.epsilon_greedy(state)
+                next_state, reward, done = self.env.step(action, prop)
                 self.replay_buffer.add(state, action, reward, next_state, done)
                 episode_reward += reward
  
@@ -79,7 +79,6 @@ class Agent:
                                                 ).max(dim=1)[0]
                 targets = batch_rewards_tensor + gamma*(1-batch_dones_tensor)*next_actions
                 targets = targets.unsqueeze(1)
-                
                 loss = self.loss_fn(targets, estimates)
 
                 self.optimizer.zero_grad()

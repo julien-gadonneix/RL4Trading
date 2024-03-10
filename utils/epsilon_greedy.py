@@ -25,7 +25,8 @@ class EpsilonGreedy:
         coin = np.random.uniform()
 
         if coin < self.epsilon:
-            action = np.random.uniform(-1, 1)
+            action = np.random.randint(0, 3)
+            prop = np.random.uniform()
         else:
             normalized_close_price, account_balance, shares_held = state
             normalized_close_price = np.array(normalized_close_price)
@@ -35,12 +36,14 @@ class EpsilonGreedy:
             account_balance_tensor = torch.tensor(account_balance, dtype=torch.float, device=self.model.device)
             shares_held_tensor = torch.tensor(shares_held, dtype=torch.float, device=self.model.device)
 
-            action = self.model(normalized_close_price_tensor,
+            actions = self.model(normalized_close_price_tensor,
                                 account_balance_tensor, 
                                 shares_held_tensor
-                                ).detach().cpu().numpy().item()
+                                ).detach().cpu().numpy().squeeze()
+            action = np.argmax(actions)
+            prop = actions[action]
 
-        return action
+        return action, prop
 
 
     def decay_epsilon(self):

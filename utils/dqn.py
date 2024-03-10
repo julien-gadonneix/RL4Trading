@@ -8,10 +8,10 @@ class DQN(nn.Module):
         self.device = device
         self.output_lstm_shape = 16
         self.hidden_layer_shape = 64
-        self.output_shape = 1
-        self.numlayers = 2
+        self.output_shape = 3
+        self.numlayers = 1
         
-        self.lstm = nn.LSTM(input_size_price_list,  self.output_lstm_shape, self.numlayers, bidirectional=True, batch_first=True)
+        self.lstm = nn.LSTM(input_size_price_list,  self.output_lstm_shape, self.numlayers, batch_first=True)
         self.fc1 = nn.Linear(self.output_lstm_shape + input_size_balance_value + input_size_num_of_shares, self.hidden_layer_shape)
         self.fc2 = nn.Linear(self.hidden_layer_shape, self.output_shape)
 
@@ -27,15 +27,15 @@ class DQN(nn.Module):
             torch.tensor: the action to be taken between -1 and 1 
         """
 
-        h0 = torch.zeros(self.numlayers, x_price_tensor.size(0), self.output_lstm_shape).to(self.device)
-        c0 = torch.zeros(self.numlayers, x_price_tensor.size(0), self.output_lstm_shape).to(self.device)
-        out, (hn, cn) = self.lstm(x_price_tensor, (h0, c0))
+        # h0 = torch.zeros(self.numlayers, x_price_tensor.size(0), self.output_lstm_shape).to(self.device)
+        # c0 = torch.zeros(self.numlayers, x_price_tensor.size(0), self.output_lstm_shape).to(self.device)
+        out, _ = self.lstm(x_price_tensor) #, (h0, c0))
         x = out[:, -1, :]
         # add the portfolio value and the number of shares to the input
         x_portfolio_value_tensor = x_portfolio_value_tensor.view(-1, 1)
         x_num_of_shares_tensor = x_num_of_shares_tensor.view(-1, 1, )
         x = torch.cat((x, x_portfolio_value_tensor, x_num_of_shares_tensor), 1)
         x = F.relu(self.fc1(x))
-        x = torch.tanh(self.fc2(x))
+        x = torch.sigmoid(self.fc2(x))
         return x
 
