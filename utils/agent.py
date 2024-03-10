@@ -17,6 +17,8 @@ class Agent:
         self.loss_fn = loss_fn
         self.replay_buffer = replay_buffer
         self.epsilon_greedy = epsilon_greedy
+        self.action_list = list()
+        self.wealth_list = list()
         
 
     def train(self, num_episodes, gamma, batch_size):
@@ -26,15 +28,19 @@ class Agent:
         episode_reward = 0.
 
         for episode_index in tqdm(range(1, num_episodes+1)):
+            self.action_list.append([])
+            self.wealth_list.append([])
             # print(f"Episode {episode_index}")
             state = self.env.reset()
             episode_reward = 0.
             for iteration in itertools.count():
 
                 action, prop = self.epsilon_greedy(state)
+                self.action_list[-1].append(action)
                 next_state, reward, done = self.env.step(action, prop)
                 self.replay_buffer.add(state, action, reward, next_state, done)
                 episode_reward += reward
+                self.wealth_list[-1].append(1000+episode_reward)
  
 
                 batch_states, batch_actions, batch_rewards, batch_next_states, batch_dones = self.replay_buffer.sample(min(batch_size, len(self.replay_buffer)))

@@ -6,10 +6,10 @@ class DQN(nn.Module):
     def __init__(self, input_size_price_list, input_size_balance_value, input_size_num_of_shares, device):
         super(DQN, self).__init__()
         self.device = device
-        self.output_lstm_shape = 16
-        self.hidden_layer_shape = 64
+        self.output_lstm_shape = 64
+        self.hidden_layer_shape = 32
         self.output_shape = 3
-        self.numlayers = 1
+        self.numlayers = 2
         
         self.lstm = nn.LSTM(input_size_price_list,  self.output_lstm_shape, self.numlayers, batch_first=True)
         self.fc1 = nn.Linear(self.output_lstm_shape + input_size_balance_value + input_size_num_of_shares, self.hidden_layer_shape)

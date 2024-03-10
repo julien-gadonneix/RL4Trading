@@ -41,7 +41,8 @@ class EpsilonGreedy:
                                 shares_held_tensor
                                 ).detach().cpu().numpy().squeeze()
             action = np.argmax(actions)
-            prop = actions[action]
+            sorted_arr = np.sort(actions)[::-1]
+            prop = sorted_arr[0] - sorted_arr[1]
 
         return action, prop
 
