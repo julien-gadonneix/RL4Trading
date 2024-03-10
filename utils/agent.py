@@ -107,5 +107,19 @@ class Agent:
             episode_reward_list.append(episode_reward)
             self.epsilon_greedy.decay_epsilon()
         return episode_reward_list
+    
+
+    def test(self, env):
+        '''Tests the agent.'''
+        state = env.reset()
+        done = False
+        episode_reward = 0.
+        while not done:
+            action, prop = self.epsilon_greedy(state)
+            next_state, reward, done = env.step(action, prop)
+            episode_reward += reward
+            state = next_state
+        return episode_reward
+
 
 
