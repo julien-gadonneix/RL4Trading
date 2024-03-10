@@ -35,7 +35,7 @@ class Agent:
                 next_state, reward, done = self.env.step(action)
                 self.replay_buffer.add(state, action, reward, next_state, done)
                 episode_reward += reward
-
+ 
 
                 batch_states, batch_actions, batch_rewards, batch_next_states, batch_dones = self.replay_buffer.sample(min(batch_size, len(self.replay_buffer)))
                 
