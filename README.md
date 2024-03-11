@@ -1,4 +1,3 @@
-
 # RL4Trading
 
 In this project, we are implementing a Reinforcement Learning algorithm for financial data analysis.
@@ -27,3 +26,18 @@ In this project, we are implementing a Reinforcement Learning algorithm for fina
 ### Deep Q-Network (DQN)
 
 * Our DQN architecture is a blend of various layers, notably incorporating LSTM due to the sequential nature of trading data. Additionally, it considers other relevant factors such as the number of stocks held and the current account balance.
+
+## How to Use the Notebook
+
+To utilize this notebook effectively, follow these steps:
+
+1. Locate the Classes:
+   - The classes required for this notebook are located in the "utils" folder. Ensure that you have access to this folder and its contents.
+
+2. Fetch Financial Data:
+   - Run the "understand.ipynb" notebook to understand how to fetch financial data. This step is crucial for gathering the necessary data for analysis.
+
+3. Understand Reinforcement Learning Process:
+   - After fetching financial data, run the "start.ipynb" notebook to comprehend the reinforcement learning process. This notebook will guide you through the steps involved in reinforcement learning for financial analysis.
+
+By following these steps, you can effectively utilize the notebook and gain insights into financial data using reinforcement learning techniques.
