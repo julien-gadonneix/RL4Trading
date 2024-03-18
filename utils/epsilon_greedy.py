@@ -33,8 +33,8 @@ class EpsilonGreedy:
             is_random_choice = False
             normalized_close_price, account_balance, shares_held = state
             normalized_close_price = np.array(normalized_close_price)
-            # from shape (21,) to (1,1,21)
-            normalized_close_price = normalized_close_price.reshape(1, 1, normalized_close_price.shape[0])
+            # from shape (21,) to (1,21,1)
+            normalized_close_price = normalized_close_price.reshape(1, normalized_close_price.shape[0],1)
             normalized_close_price_tensor = torch.tensor(normalized_close_price, dtype=torch.float, device=self.model.device)
             account_balance_tensor = torch.tensor(account_balance, dtype=torch.float, device=self.model.device)
             shares_held_tensor = torch.tensor(shares_held, dtype=torch.float, device=self.model.device)

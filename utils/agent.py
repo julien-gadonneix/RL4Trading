@@ -52,7 +52,7 @@ class Agent:
                 normalized_close_prices , account_balances, shares_held = zip(*batch_states)
                 normalized_close_prices = np.array(normalized_close_prices)
                 # reshape coordinate number 1
-                normalized_close_prices = normalized_close_prices.reshape(normalized_close_prices.shape[0], 1, normalized_close_prices.shape[1])
+                normalized_close_prices = normalized_close_prices.reshape(normalized_close_prices.shape[0], normalized_close_prices.shape[1], 1)
                 account_balances = np.array(account_balances)
                 shares_held = np.array(shares_held)
 
@@ -64,7 +64,7 @@ class Agent:
 
                 next_normalized_close_prices , next_account_balances, next_shares_held = zip(*batch_next_states)
                 next_normalized_close_prices = np.array(next_normalized_close_prices)
-                next_normalized_close_prices = next_normalized_close_prices.reshape(next_normalized_close_prices.shape[0], 1, next_normalized_close_prices.shape[1])
+                next_normalized_close_prices = next_normalized_close_prices.reshape(next_normalized_close_prices.shape[0], next_normalized_close_prices.shape[1], 1)
                 next_account_balances = np.array(next_account_balances)
                 next_shares_held = np.array(next_shares_held)
 

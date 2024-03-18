@@ -26,7 +26,6 @@ class DQN(nn.Module):
         Returns:
             torch.tensor: the action to be taken between -1 and 1 
         """
-
         # h0 = torch.zeros(self.numlayers, x_price_tensor.size(0), self.output_lstm_shape).to(self.device)
         # c0 = torch.zeros(self.numlayers, x_price_tensor.size(0), self.output_lstm_shape).to(self.device)
         out, _ = self.lstm(x_price_tensor) #, (h0, c0))
