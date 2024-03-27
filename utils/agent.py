@@ -107,9 +107,14 @@ class Agent:
                 state = next_state
                 iteration += 1
             percentage_of_random_choices = np.mean(np.array(self.random_choice_list[-1]))
-            print(f"Episode {episode_index}, reward: {episode_reward}, percentage of random = {percentage_of_random_choices}")
+            print(f"Episode {episode_index}, reward: {episode_reward:.2f}, percentage of random = {percentage_of_random_choices:.2f}")
             episode_reward_list.append(episode_reward)
             self.epsilon_greedy.decay_epsilon()
+            # save model every 20 episodes
+            if episode_index % 20 == 0:
+                print(f"Saving model at episode {episode_index}")
+                torch.save(self.model.state_dict(), f"model_{episode_index}.pt")
+
         return episode_reward_list
     
 
