@@ -39,9 +39,10 @@ class Agent:
     
     '''
 
-    def __init__(self, env, model, target_model, target_q_network_sync_period, optimizer, lr_scheduler, loss_fn, replay_buffer, epsilon_greedy):
+    def __init__(self, env, model, type_of_model, target_model, target_q_network_sync_period, optimizer, lr_scheduler, loss_fn, replay_buffer, epsilon_greedy):
         self.env = env
         self.model = model
+        self.type_of_model = type_of_model
         self.target_model = target_model
         self.target_q_network_sync_period = target_q_network_sync_period
         self.optimizer = optimizer
@@ -77,7 +78,7 @@ class Agent:
             episode_reward = 0.
             for iteration in itertools.count():
 
-                action, prop, is_random_choice = self.epsilon_greedy(state)
+                action, prop, is_random_choice = self.epsilon_greedy(state, self.type_of_model)
                 self.random_choice_list[-1].append(is_random_choice)
                 self.action_list[-1].append(action)
                 next_state, reward, done = self.env.step(action, prop)
@@ -120,18 +121,31 @@ class Agent:
 
                 sequence_length = normalized_close_prices_tensor.size(1)
 
-                tgt_mask = self.model.get_tgt_mask(sequence_length).to(self.model.device)
+                if self.type_of_model == "DQN" :
 
-                estimates = self.model(normalized_close_prices_tensor,
-                                        account_balances_tensor, 
-                                        shares_held_tensor,
-                                        tgt_mask
-                                        ).gather(1, batch_actions_tensor.unsqueeze(1))
-                next_actions = self.target_model(next_normalized_close_prices_tensor,
-                                                next_account_balances_tensor, 
-                                                next_shares_held_tensor,
-                                                tgt_mask
-                                                ).max(dim=1)[0]
+                    estimates = self.model(normalized_close_prices_tensor,
+                                            account_balances_tensor, 
+                                            shares_held_tensor
+                                            ).gather(1, batch_actions_tensor.unsqueeze(1))
+                    next_actions = self.target_model(next_normalized_close_prices_tensor,
+                                                    next_account_balances_tensor, 
+                                                    next_shares_held_tensor
+                                                    ).max(dim=1)[0]
+
+                elif self.type_of_model == 'DQN_with_Transformer':
+
+                    tgt_mask = self.model.get_tgt_mask(sequence_length).to(self.model.device)
+
+                    estimates = self.model(normalized_close_prices_tensor,
+                                            account_balances_tensor, 
+                                            shares_held_tensor,
+                                            tgt_mask
+                                            ).gather(1, batch_actions_tensor.unsqueeze(1))
+                    next_actions = self.target_model(next_normalized_close_prices_tensor,
+                                                    next_account_balances_tensor, 
+                                                    next_shares_held_tensor,
+                                                    tgt_mask
+                                                    ).max(dim=1)[0]
                 targets = batch_rewards_tensor + gamma*(1-batch_dones_tensor)*next_actions
                 targets = targets.unsqueeze(1)
                 loss = self.loss_fn(targets, estimates)
@@ -182,7 +196,7 @@ class Agent:
         done = False
         self.epsilon_greedy.epsilon = 0.
         while not done:
-            action, prop, is_random_choice = self.epsilon_greedy(state)
+            action, prop, is_random_choice = self.epsilon_greedy(state, self.type_of_model)
             next_state, reward, done = env.step(action, prop)
             action_list.append(action)
             prop_list.append(prop)

@@ -20,7 +20,7 @@ class EpsilonGreedy:
         self.model = model
 
 
-    def __call__(self, state: np.ndarray):
+    def __call__(self, state: np.ndarray, type_of_model: str):
         '''Select an action for the given state using the epsilon-greedy policy.'''
         coin = np.random.uniform()
         is_random_choice = True
@@ -41,13 +41,22 @@ class EpsilonGreedy:
 
             sequence_length = normalized_close_price_tensor.size(1)
 
-            tgt_mask = self.model.get_tgt_mask(sequence_length).to(self.model.device)
+            if type_of_model == "DQN" : 
+                actions = self.model(normalized_close_price_tensor,
+                                    account_balance_tensor, 
+                                    shares_held_tensor
+                                    ).detach().cpu().numpy().squeeze()
 
-            actions = self.model(normalized_close_price_tensor,
-                                account_balance_tensor, 
-                                shares_held_tensor,
-                                tgt_mask
-                                ).detach().cpu().numpy().squeeze()
+            if type_of_model == 'DQN_with_Transformer':
+
+                tgt_mask = self.model.get_tgt_mask(sequence_length).to(self.model.device)
+
+                actions = self.model(normalized_close_price_tensor,
+                                    account_balance_tensor, 
+                                    shares_held_tensor,
+                                    tgt_mask
+                                    ).detach().cpu().numpy().squeeze()
+                
             action = np.argmax(actions)
             sorted_arr = np.sort(actions)[::-1]
             prop = sorted_arr[0] - sorted_arr[1]
