@@ -3,6 +3,8 @@ import torch
 from tqdm.notebook import tqdm
 import itertools
 
+SAVE_MODEL_EVERY = 50
+
 
 class Agent:
     '''Agent class to interact with the environment.'''
@@ -93,7 +95,7 @@ class Agent:
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
-                self.lr_scheduler.step()
+                
 
 
                 if iteration % self.target_q_network_sync_period == 0:
@@ -107,11 +109,12 @@ class Agent:
                 state = next_state
                 iteration += 1
             percentage_of_random_choices = np.mean(np.array(self.random_choice_list[-1]))
-            print(f"Episode {episode_index}, reward: {episode_reward:.2f}, percentage of random = {percentage_of_random_choices:.2f}")
+            print(f"Ep {episode_index}, reward: {episode_reward:.2f}, % of random = {percentage_of_random_choices:.2f}, lr = {self.optimizer.param_groups[0]['lr']:.2e}")
             episode_reward_list.append(episode_reward)
             self.epsilon_greedy.decay_epsilon()
+            self.lr_scheduler.step()
             # save model every 20 episodes
-            if episode_index % 20 == 0:
+            if episode_index % SAVE_MODEL_EVERY == 0:
                 print(f"Saving model at episode {episode_index}")
                 torch.save(self.model.state_dict(), f"model_{episode_index}.pt")
 
@@ -121,14 +124,20 @@ class Agent:
     def test(self, env):
         '''Tests the agent.'''
         state = env.reset()
+        reward_list = []
+        action_list = []
+        prop_list = []
         done = False
-        episode_reward = 0.
+        self.epsilon_greedy.epsilon = 0.
         while not done:
-            action, prop = self.epsilon_greedy(state)
+            action, prop, is_random_choice = self.epsilon_greedy(state)
             next_state, reward, done = env.step(action, prop)
-            episode_reward += reward
+            action_list.append(action)
+            prop_list.append(prop)
+            reward_list.append(reward)
+            print(f"Action: {action}, Reward: {reward:.2f}, Random Choice: {is_random_choice}, Done: {done}")
             state = next_state
-        return episode_reward
+        return reward_list, action_list, prop_list
 
 
 

@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
+import math
 
 class DQN(nn.Module):
     def __init__(self, number_of_data, input_size_price_list, input_size_balance_value, input_size_num_of_shares, device):
@@ -44,8 +45,12 @@ class DQN_with_Transformer(nn.Module):
         self.device = device
         self.hidden_layer_shape = 32
         self.output_shape = 3
+        self.dim_model = number_of_data
         # Transformer layer expects input size in the format [sequence length, batch size, features]
-        self.transformer = nn.Transformer(nhead=1, batch_first=True, d_model = 1, dropout=0.1)
+        self.positional_encoder = PositionalEncoding(
+            dim_model=self.dim_model, dropout_p=0.1, max_len=5000
+        )
+        self.transformer = nn.Transformer(nhead=1, batch_first=True, d_model = self.dim_model, dropout=0.1)
         self.fc1 = nn.Linear(input_size_price_list + input_size_balance_value + input_size_num_of_shares, self.hidden_layer_shape)
         self.fc2 = nn.Linear(self.hidden_layer_shape, self.output_shape)
 
@@ -60,7 +65,9 @@ class DQN_with_Transformer(nn.Module):
         Returns:
             torch.tensor: the action to be taken between -1 and 1 
         """
-
+        
+        # Apply the positional encoding
+        x_price_tensor = self.positional_encoder(x_price_tensor)
         # Apply the transformer layer
         x = self.transformer(x_price_tensor, x_price_tensor)
         # x is shape [1, 21, 1] and i want to reshape it to [1, 21]
@@ -77,3 +84,31 @@ class DQN_with_Transformer(nn.Module):
         x = torch.sigmoid(self.fc2(x))
         # between -1 and 1
         return x
+    
+class PositionalEncoding(nn.Module):
+    def __init__(self, dim_model, dropout_p, max_len):
+        super().__init__()
+        # Modified version from: https://pytorch.org/tutorials/beginner/transformer_tutorial.html
+        # max_len determines how far the position can have an effect on a token (window)
+        
+        # Info
+        self.dropout = nn.Dropout(dropout_p)
+        
+        # Encoding - From formula
+        pos_encoding = torch.zeros(max_len, dim_model)
+        positions_list = torch.arange(0, max_len, dtype=torch.float).view(-1, 1) # 0, 1, 2, 3, 4, 5
+        division_term = torch.exp(torch.arange(0, dim_model, 2).float() * (-math.log(10000.0)) / dim_model) # 1000^(2i/dim_model)
+        
+        # PE(pos, 2i) = sin(pos/1000^(2i/dim_model))
+        pos_encoding[:, 0::2] = torch.sin(positions_list * division_term)
+        
+        # PE(pos, 2i + 1) = cos(pos/1000^(2i/dim_model))
+        pos_encoding[:, 1::2] = torch.cos(positions_list * division_term)
+        
+        # Saving buffer (same as parameter without gradients needed)
+        pos_encoding = pos_encoding.unsqueeze(0).transpose(0, 1)
+        self.register_buffer("pos_encoding",pos_encoding)
+        
+    def forward(self, token_embedding: torch.tensor) -> torch.tensor:
+        # Residual connection + pos encoding
+        return self.dropout(token_embedding + self.pos_encoding[:token_embedding.size(0), :])
