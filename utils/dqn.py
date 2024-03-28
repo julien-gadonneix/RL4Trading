@@ -46,6 +46,7 @@ class DQN_with_Transformer(nn.Module):
         self.hidden_layer_shape = 32
         self.output_shape = 3
         self.dim_model = number_of_data
+        self.lengh_of_sequence = input_size_price_list
         # Transformer layer expects input size in the format [sequence length, batch size, features]
         self.positional_encoder = PositionalEncoding(
             dim_model=self.dim_model, dropout_p=0.1, max_len=5000
@@ -71,7 +72,7 @@ class DQN_with_Transformer(nn.Module):
         # Apply the transformer layer
         x = self.transformer(x_price_tensor, x_price_tensor, tgt_mask=tgt_mask, src_key_padding_mask=src_pad_mask, tgt_key_padding_mask=tgt_pad_mask)
         # x is shape [1, 21, 1] and i want to reshape it to [1, 21]
-        x = x.view(-1, 21) 
+        x = x.view(-1, self.lengh_of_sequence) 
         # Add the portfolio value and the number of shares to the input
         x_portfolio_value_tensor = x_portfolio_value_tensor.view(-1, 1)
         x_num_of_shares_tensor = x_num_of_shares_tensor.view(-1, 1)
