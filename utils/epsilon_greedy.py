@@ -47,7 +47,7 @@ class EpsilonGreedy:
                                     shares_held_tensor
                                     ).detach().cpu().numpy().squeeze()
 
-            if type_of_model == 'DQN_with_Transformer':
+            elif type_of_model == 'DQN_with_Transformer':
 
                 tgt_mask = self.model.get_tgt_mask(sequence_length).to(self.model.device)
 
@@ -56,7 +56,13 @@ class EpsilonGreedy:
                                     shares_held_tensor,
                                     tgt_mask
                                     ).detach().cpu().numpy().squeeze()
-                
+            
+            elif type_of_model == "DDDQN" :
+                actions = self.model(normalized_close_price_tensor,
+                                    account_balance_tensor, 
+                                    shares_held_tensor
+                                    ).detach().cpu().numpy().squeeze()
+            
             action = np.argmax(actions)
             sorted_arr = np.sort(actions)[::-1]
             prop = (sorted_arr[0] - sorted_arr[1]) / sorted_arr[0]

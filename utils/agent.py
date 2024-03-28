@@ -146,6 +146,17 @@ class Agent:
                                                     next_shares_held_tensor,
                                                     tgt_mask
                                                     ).max(dim=1)[0]
+                
+                elif self.type_of_model == "DDDQN":
+                    estimates = self.model(normalized_close_prices_tensor,
+                                            account_balances_tensor, 
+                                            shares_held_tensor
+                                            ).gather(1, batch_actions_tensor.unsqueeze(1))
+                    next_actions = self.target_model(next_normalized_close_prices_tensor,
+                                                    next_account_balances_tensor, 
+                                                    next_shares_held_tensor
+                                                    ).max(dim=1)[0]
+                
                 targets = batch_rewards_tensor + gamma*(1-batch_dones_tensor)*next_actions
                 targets = targets.unsqueeze(1)
                 loss = self.loss_fn(targets, estimates)
