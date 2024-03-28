@@ -11,7 +11,7 @@ class MinimumExponentialLR(torch.optim.lr_scheduler.ExponentialLR):
         super().__init__(optimizer, lr_decay, last_epoch=-1)
 
 
-    def get_lr(self) -> List[float]:
+    def get_lr(self):
         '''Compute learning rate using chainable form of the scheduler.'''
         return [
             max(base_lr * self.gamma ** self.last_epoch, self.min_lr)

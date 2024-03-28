@@ -17,8 +17,7 @@ class DQN(nn.Module):
         self.fc2 = nn.Linear(self.hidden_layer_shape, self.output_shape)
 
     def forward(self, x_price_tensor, x_portfolio_value_tensor, x_num_of_shares_tensor):
-        """_summary_
-
+        """Forward pass of the model.
         Args:
             x_price_tensor (torch.tensor): list of T last stock prices
             x_portfolio_value_tensor (torch.tensor): value of the balance at time t
@@ -56,8 +55,7 @@ class DQN_with_Transformer(nn.Module):
         self.fc2 = nn.Linear(self.hidden_layer_shape, self.output_shape)
 
     def forward(self, x_price_tensor, x_portfolio_value_tensor, x_num_of_shares_tensor, tgt_mask=None, src_pad_mask=None, tgt_pad_mask=None):
-        """_summary_
-
+        """Forward pass of the model.
         Args:
             x_price_tensor (torch.tensor): list of T last stock prices
             x_portfolio_value_tensor (torch.tensor): value of the balance at time t
@@ -153,8 +151,7 @@ class DDDQN(nn.Module):
         self.fc3 = nn.Linear(self.hidden_layer_shape, self.output_shape)
 
     def forward(self, x_price_tensor, x_portfolio_value_tensor, x_num_of_shares_tensor):
-        """_summary_
-
+        """Forward pass of the model.
         Args:
             x_price_tensor (torch.tensor): list of T last stock prices
             x_portfolio_value_tensor (torch.tensor): value of the balance at time t

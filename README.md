@@ -35,7 +35,7 @@ To utilize this notebook effectively, follow these steps:
    - The classes required for this notebook are located in the "utils" folder. Ensure that you have access to this folder and its contents.
 
 2. Fetch Financial Data:
-   - Run the "understand.ipynb" notebook to understand how to fetch financial data. This step is crucial for gathering the necessary data for analysis.
+   - Run the "get_financial_data.ipynb" notebook to understand how to fetch financial data. This step is crucial for gathering the necessary data for analysis.
 
 3. Understand Reinforcement Learning Process:
    - After fetching financial data, run the "start.ipynb" notebook to comprehend the reinforcement learning process. This notebook will guide you through the steps involved in reinforcement learning for financial analysis.
