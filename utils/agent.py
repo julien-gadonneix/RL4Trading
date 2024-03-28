@@ -167,7 +167,7 @@ class Agent:
                 state = next_state
                 iteration += 1
             percentage_of_random_choices = np.mean(np.array(self.random_choice_list[-1]))
-            print(f"Ep {episode_index}, reward: {episode_reward:.2f}, % of random = {percentage_of_random_choices:.2f}, lr = {self.optimizer.param_groups[0]['lr']:.2e}")
+            print(f"Ep {episode_index}, reward: {episode_reward:.2f}, % of random = {percentage_of_random_choices:.2f}, lr = {self.optimizer.param_groups[0]['lr']:.2e}, % sell= {np.mean(np.array(self.action_list[-1])==0):.2f}, % hold= {np.mean(np.array(self.action_list[-1])==1):.2f}, % buy= {np.mean(np.array(self.action_list[-1])==2):.2f}")
             episode_reward_list.append(episode_reward)
             self.epsilon_greedy.decay_epsilon()
             self.lr_scheduler.step()
