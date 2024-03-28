@@ -59,7 +59,7 @@ class EpsilonGreedy:
                 
             action = np.argmax(actions)
             sorted_arr = np.sort(actions)[::-1]
-            prop = sorted_arr[0] - sorted_arr[1]
+            prop = (sorted_arr[0] - sorted_arr[1]) / sorted_arr[0]
          
 
         return action, prop, is_random_choice

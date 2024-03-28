@@ -36,7 +36,7 @@ class DQN(nn.Module):
         x_num_of_shares_tensor = x_num_of_shares_tensor.view(-1, 1, )
         x = torch.cat((x, x_portfolio_value_tensor, x_num_of_shares_tensor), 1)
         x = F.relu(self.fc1(x))
-        x = torch.sigmoid(self.fc2(x))
+        x = self.fc2(x)
         return x
 
 class DQN_with_Transformer(nn.Module):
@@ -82,8 +82,7 @@ class DQN_with_Transformer(nn.Module):
         
         # Apply fully connected layers
         x = F.relu(self.fc1(x))
-        x = torch.sigmoid(self.fc2(x))
-        # between -1 and 1
+        x = self.fc2(x)
         return x
     
     def get_tgt_mask(self, size) -> torch.tensor:
