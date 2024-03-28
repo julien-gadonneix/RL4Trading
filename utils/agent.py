@@ -7,7 +7,37 @@ SAVE_MODEL_EVERY = 50
 
 
 class Agent:
-    '''Agent class to interact with the environment.'''
+    '''Agent class to interact with the environment.
+    Args:
+        env (Environment): Environment to interact with.
+        model (nn.Module): Model to use for the agent.
+        target_model (nn.Module): Target model to use for the agent.
+        target_q_network_sync_period (int): Period to sync the target model with the model.
+        optimizer (Optimizer): Optimizer to use for the agent.
+        lr_scheduler (LRScheduler): Learning rate scheduler to use for the agent.
+        loss_fn (function): Loss function to use for the agent.
+        replay_buffer (ReplayBuffer): Replay buffer to use for the agent.
+        epsilon_greedy (EpsilonGreedy): Epsilon greedy strategy to use for the agent.
+
+    Attributes:
+        env (Environment): Environment to interact with.
+        model (nn.Module): Model to use for the agent.
+        target_model (nn.Module): Target model to use for the agent.
+        target_q_network_sync_period (int): Period to sync the target model with the model.
+        optimizer (Optimizer): Optimizer to use for the agent.
+        lr_scheduler (LRScheduler): Learning rate scheduler to use for the agent.
+        loss_fn (function): Loss function to use for the agent.
+        replay_buffer (ReplayBuffer): Replay buffer to use for the agent.
+        epsilon_greedy (EpsilonGreedy): Epsilon greedy strategy to use for the agent.
+        action_list (list): List of actions taken in each episode.
+        wealth_list (list): List of wealths obtained in each episode.
+        random_choice_list (list): List of random choices made in each episode.
+
+    Methods:
+        train: Trains the agent.
+        test: Tests the agent.
+    
+    '''
 
     def __init__(self, env, model, target_model, target_q_network_sync_period, optimizer, lr_scheduler, loss_fn, replay_buffer, epsilon_greedy):
         self.env = env
@@ -25,7 +55,15 @@ class Agent:
         
 
     def train(self, num_episodes, gamma, batch_size):
-        '''Trains the agent.'''
+        '''Trains the agent
+        Args:
+            num_episodes (int): Number of episodes to train the agent for.
+            gamma (float): Discount factor.
+            batch_size (int): Batch size for training the agent.
+
+        Returns:
+            episode_reward_list (list): List of rewards obtained in each episode.
+        '''
         iteration = 0
         episode_reward_list = []
         episode_reward = 0.
@@ -122,7 +160,15 @@ class Agent:
     
 
     def test(self, env):
-        '''Tests the agent.'''
+        '''Tests the agent.
+        Args:
+            env (Environment): Environment to test the agent on.
+            
+        Returns:
+            reward_list (list): List of rewards obtained in the episode.
+            action_list (list): List of actions taken in the episode.
+            prop_list (list): List of propensities of the actions taken in the episode.
+        '''
         state = env.reset()
         reward_list = []
         action_list = []
