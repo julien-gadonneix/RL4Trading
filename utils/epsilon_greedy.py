@@ -39,9 +39,14 @@ class EpsilonGreedy:
             account_balance_tensor = torch.tensor(account_balance, dtype=torch.float, device=self.model.device)
             shares_held_tensor = torch.tensor(shares_held, dtype=torch.float, device=self.model.device)
 
+            sequence_length = normalized_close_price_tensor.size(1)
+
+            tgt_mask = self.model.get_tgt_mask(sequence_length).to(self.model.device)
+
             actions = self.model(normalized_close_price_tensor,
                                 account_balance_tensor, 
-                                shares_held_tensor
+                                shares_held_tensor,
+                                tgt_mask
                                 ).detach().cpu().numpy().squeeze()
             action = np.argmax(actions)
             sorted_arr = np.sort(actions)[::-1]

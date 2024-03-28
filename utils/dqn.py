@@ -54,7 +54,7 @@ class DQN_with_Transformer(nn.Module):
         self.fc1 = nn.Linear(input_size_price_list + input_size_balance_value + input_size_num_of_shares, self.hidden_layer_shape)
         self.fc2 = nn.Linear(self.hidden_layer_shape, self.output_shape)
 
-    def forward(self, x_price_tensor, x_portfolio_value_tensor, x_num_of_shares_tensor):
+    def forward(self, x_price_tensor, x_portfolio_value_tensor, x_num_of_shares_tensor, tgt_mask=None, src_pad_mask=None, tgt_pad_mask=None):
         """_summary_
 
         Args:
@@ -69,7 +69,7 @@ class DQN_with_Transformer(nn.Module):
         # Apply the positional encoding
         x_price_tensor = self.positional_encoder(x_price_tensor)
         # Apply the transformer layer
-        x = self.transformer(x_price_tensor, x_price_tensor)
+        x = self.transformer(x_price_tensor, x_price_tensor, tgt_mask=tgt_mask, src_key_padding_mask=src_pad_mask, tgt_key_padding_mask=tgt_pad_mask)
         # x is shape [1, 21, 1] and i want to reshape it to [1, 21]
         x = x.view(-1, 21) 
         # Add the portfolio value and the number of shares to the input
@@ -84,6 +84,27 @@ class DQN_with_Transformer(nn.Module):
         x = torch.sigmoid(self.fc2(x))
         # between -1 and 1
         return x
+    
+    def get_tgt_mask(self, size) -> torch.tensor:
+        # Generates a squeare matrix where the each row allows one word more to be seen
+        mask = torch.tril(torch.ones(size, size) == 1) # Lower triangular matrix
+        mask = mask.float()
+        mask = mask.masked_fill(mask == 0, float('-inf')) # Convert zeros to -inf
+        mask = mask.masked_fill(mask == 1, float(0.0)) # Convert ones to 0
+        
+        # EX for size=5:
+        # [[0., -inf, -inf, -inf, -inf],
+        #  [0.,   0., -inf, -inf, -inf],
+        #  [0.,   0.,   0., -inf, -inf],
+        #  [0.,   0.,   0.,   0., -inf],
+        #  [0.,   0.,   0.,   0.,   0.]]
+        
+        return mask
+    
+    def create_pad_mask(self, matrix: torch.tensor, pad_token: int) -> torch.tensor:
+        # If matrix = [1,2,3,0,0,0] where pad_token=0, the result mask is
+        # [False, False, False, True, True, True]
+        return (matrix == pad_token)
     
 class PositionalEncoding(nn.Module):
     def __init__(self, dim_model, dropout_p, max_len):

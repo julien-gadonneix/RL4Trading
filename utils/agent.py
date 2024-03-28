@@ -118,13 +118,19 @@ class Agent:
                 batch_rewards_tensor = torch.tensor(batch_rewards, dtype=torch.float32, device=self.model.device)
                 batch_dones_tensor = torch.tensor(batch_dones, dtype=torch.float32, device=self.model.device)
 
+                sequence_length = normalized_close_prices_tensor.size(1)
+
+                tgt_mask = self.model.get_tgt_mask(sequence_length).to(self.model.device)
+
                 estimates = self.model(normalized_close_prices_tensor,
                                         account_balances_tensor, 
-                                        shares_held_tensor
+                                        shares_held_tensor,
+                                        tgt_mask
                                         ).gather(1, batch_actions_tensor.unsqueeze(1))
                 next_actions = self.target_model(next_normalized_close_prices_tensor,
                                                 next_account_balances_tensor, 
-                                                next_shares_held_tensor
+                                                next_shares_held_tensor,
+                                                tgt_mask
                                                 ).max(dim=1)[0]
                 targets = batch_rewards_tensor + gamma*(1-batch_dones_tensor)*next_actions
                 targets = targets.unsqueeze(1)
